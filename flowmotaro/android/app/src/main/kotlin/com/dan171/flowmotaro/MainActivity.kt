@@ -1,4 +1,4 @@
-package com.example.flowmotaro
+package com.dan171.flowmotaro
 
 import io.flutter.embedding.android.FlutterActivity
 

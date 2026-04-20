@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.flowmotaro"
+    namespace = "com.dan171.flowmotaro"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
