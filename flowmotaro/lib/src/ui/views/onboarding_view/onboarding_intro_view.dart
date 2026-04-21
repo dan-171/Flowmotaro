@@ -1,4 +1,4 @@
-import 'package:flowmotaro/src/ui/views/onboarding_view/onboarding_sign_in_view.dart';
+import 'package:flowmotaro/src/ui/views/onboarding_view/onboarding_sign_in_view/onboarding_sign_in_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../config/constants.dart';
