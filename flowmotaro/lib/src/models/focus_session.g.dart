@@ -17,46 +17,19 @@ const FocusSessionSchema = CollectionSchema(
   name: r'FocusSession',
   id: 7529488139707530527,
   properties: {
-    r'breakActive': PropertySchema(
-      id: 0,
-      name: r'breakActive',
-      type: IsarType.bool,
-    ),
-    r'createdAt': PropertySchema(
-      id: 1,
-      name: r'createdAt',
-      type: IsarType.dateTime,
-    ),
-    r'focusActive': PropertySchema(
-      id: 2,
-      name: r'focusActive',
-      type: IsarType.bool,
-    ),
-    r'highestStreak': PropertySchema(
+    r'duration': PropertySchema(id: 0, name: r'duration', type: IsarType.long),
+    r'endAt': PropertySchema(id: 1, name: r'endAt', type: IsarType.dateTime),
+    r'isSynced': PropertySchema(id: 2, name: r'isSynced', type: IsarType.bool),
+    r'startAt': PropertySchema(
       id: 3,
-      name: r'highestStreak',
-      type: IsarType.long,
-    ),
-    r'isSynced': PropertySchema(id: 4, name: r'isSynced', type: IsarType.bool),
-    r'lastFocusAt': PropertySchema(
-      id: 5,
-      name: r'lastFocusAt',
+      name: r'startAt',
       type: IsarType.dateTime,
     ),
-    r'streakCount': PropertySchema(
-      id: 6,
-      name: r'streakCount',
-      type: IsarType.long,
-    ),
-    r'taroCount': PropertySchema(
-      id: 7,
-      name: r'taroCount',
-      type: IsarType.long,
-    ),
-    r'weekFocusDuration': PropertySchema(
-      id: 8,
-      name: r'weekFocusDuration',
-      type: IsarType.long,
+    r'type': PropertySchema(
+      id: 4,
+      name: r'type',
+      type: IsarType.byte,
+      enumMap: _FocusSessiontypeEnumValueMap,
     ),
   },
 
@@ -97,15 +70,11 @@ void _focusSessionSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeBool(offsets[0], object.breakActive);
-  writer.writeDateTime(offsets[1], object.createdAt);
-  writer.writeBool(offsets[2], object.focusActive);
-  writer.writeLong(offsets[3], object.highestStreak);
-  writer.writeBool(offsets[4], object.isSynced);
-  writer.writeDateTime(offsets[5], object.lastFocusAt);
-  writer.writeLong(offsets[6], object.streakCount);
-  writer.writeLong(offsets[7], object.taroCount);
-  writer.writeLong(offsets[8], object.weekFocusDuration);
+  writer.writeLong(offsets[0], object.duration);
+  writer.writeDateTime(offsets[1], object.endAt);
+  writer.writeBool(offsets[2], object.isSynced);
+  writer.writeDateTime(offsets[3], object.startAt);
+  writer.writeByte(offsets[4], object.type.index);
 }
 
 FocusSession _focusSessionDeserialize(
@@ -115,16 +84,14 @@ FocusSession _focusSessionDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = FocusSession();
-  object.breakActive = reader.readBool(offsets[0]);
-  object.createdAt = reader.readDateTime(offsets[1]);
-  object.focusActive = reader.readBool(offsets[2]);
-  object.highestStreak = reader.readLong(offsets[3]);
+  object.duration = reader.readLong(offsets[0]);
+  object.endAt = reader.readDateTime(offsets[1]);
   object.id = id;
-  object.isSynced = reader.readBool(offsets[4]);
-  object.lastFocusAt = reader.readDateTime(offsets[5]);
-  object.streakCount = reader.readLong(offsets[6]);
-  object.taroCount = reader.readLong(offsets[7]);
-  object.weekFocusDuration = reader.readLong(offsets[8]);
+  object.isSynced = reader.readBool(offsets[2]);
+  object.startAt = reader.readDateTime(offsets[3]);
+  object.type =
+      _FocusSessiontypeValueEnumMap[reader.readByteOrNull(offsets[4])] ??
+      SessionType.focusSession;
   return object;
 }
 
@@ -136,27 +103,27 @@ P _focusSessionDeserializeProp<P>(
 ) {
   switch (propertyId) {
     case 0:
-      return (reader.readBool(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 1:
       return (reader.readDateTime(offset)) as P;
     case 2:
       return (reader.readBool(offset)) as P;
     case 3:
-      return (reader.readLong(offset)) as P;
-    case 4:
-      return (reader.readBool(offset)) as P;
-    case 5:
       return (reader.readDateTime(offset)) as P;
-    case 6:
-      return (reader.readLong(offset)) as P;
-    case 7:
-      return (reader.readLong(offset)) as P;
-    case 8:
-      return (reader.readLong(offset)) as P;
+    case 4:
+      return (_FocusSessiontypeValueEnumMap[reader.readByteOrNull(offset)] ??
+              SessionType.focusSession)
+          as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
 }
+
+const _FocusSessiontypeEnumValueMap = {'focusSession': 0, 'breakSession': 1};
+const _FocusSessiontypeValueEnumMap = {
+  0: SessionType.focusSession,
+  1: SessionType.breakSession,
+};
 
 Id _focusSessionGetId(FocusSession object) {
   return object.id;
@@ -260,30 +227,21 @@ extension FocusSessionQueryWhere
 extension FocusSessionQueryFilter
     on QueryBuilder<FocusSession, FocusSession, QFilterCondition> {
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  breakActiveEqualTo(bool value) {
+  durationEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'breakActive', value: value),
+        FilterCondition.equalTo(property: r'duration', value: value),
       );
     });
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  createdAtEqualTo(DateTime value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'createdAt', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  createdAtGreaterThan(DateTime value, {bool include = false}) {
+  durationGreaterThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
           include: include,
-          property: r'createdAt',
+          property: r'duration',
           value: value,
         ),
       );
@@ -291,12 +249,12 @@ extension FocusSessionQueryFilter
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  createdAtLessThan(DateTime value, {bool include = false}) {
+  durationLessThan(int value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.lessThan(
           include: include,
-          property: r'createdAt',
+          property: r'duration',
           value: value,
         ),
       );
@@ -304,16 +262,16 @@ extension FocusSessionQueryFilter
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  createdAtBetween(
-    DateTime lower,
-    DateTime upper, {
+  durationBetween(
+    int lower,
+    int upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.between(
-          property: r'createdAt',
+          property: r'duration',
           lower: lower,
           includeLower: includeLower,
           upper: upper,
@@ -323,61 +281,54 @@ extension FocusSessionQueryFilter
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  focusActiveEqualTo(bool value) {
+  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition> endAtEqualTo(
+    DateTime value,
+  ) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'focusActive', value: value),
+        FilterCondition.equalTo(property: r'endAt', value: value),
       );
     });
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  highestStreakEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'highestStreak', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  highestStreakGreaterThan(int value, {bool include = false}) {
+  endAtGreaterThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
           include: include,
-          property: r'highestStreak',
+          property: r'endAt',
           value: value,
         ),
       );
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  highestStreakLessThan(int value, {bool include = false}) {
+  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition> endAtLessThan(
+    DateTime value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.lessThan(
           include: include,
-          property: r'highestStreak',
+          property: r'endAt',
           value: value,
         ),
       );
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  highestStreakBetween(
-    int lower,
-    int upper, {
+  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition> endAtBetween(
+    DateTime lower,
+    DateTime upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.between(
-          property: r'highestStreak',
+          property: r'endAt',
           lower: lower,
           includeLower: includeLower,
           upper: upper,
@@ -456,21 +407,21 @@ extension FocusSessionQueryFilter
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  lastFocusAtEqualTo(DateTime value) {
+  startAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'lastFocusAt', value: value),
+        FilterCondition.equalTo(property: r'startAt', value: value),
       );
     });
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  lastFocusAtGreaterThan(DateTime value, {bool include = false}) {
+  startAtGreaterThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
           include: include,
-          property: r'lastFocusAt',
+          property: r'startAt',
           value: value,
         ),
       );
@@ -478,12 +429,12 @@ extension FocusSessionQueryFilter
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  lastFocusAtLessThan(DateTime value, {bool include = false}) {
+  startAtLessThan(DateTime value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.lessThan(
           include: include,
-          property: r'lastFocusAt',
+          property: r'startAt',
           value: value,
         ),
       );
@@ -491,7 +442,7 @@ extension FocusSessionQueryFilter
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  lastFocusAtBetween(
+  startAtBetween(
     DateTime lower,
     DateTime upper, {
     bool includeLower = true,
@@ -500,7 +451,7 @@ extension FocusSessionQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.between(
-          property: r'lastFocusAt',
+          property: r'startAt',
           lower: lower,
           includeLower: includeLower,
           upper: upper,
@@ -510,162 +461,54 @@ extension FocusSessionQueryFilter
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  streakCountEqualTo(int value) {
+  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition> typeEqualTo(
+    SessionType value,
+  ) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'streakCount', value: value),
+        FilterCondition.equalTo(property: r'type', value: value),
       );
     });
   }
 
   QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  streakCountGreaterThan(int value, {bool include = false}) {
+  typeGreaterThan(SessionType value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.greaterThan(
           include: include,
-          property: r'streakCount',
+          property: r'type',
           value: value,
         ),
       );
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  streakCountLessThan(int value, {bool include = false}) {
+  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition> typeLessThan(
+    SessionType value, {
+    bool include = false,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.lessThan(
           include: include,
-          property: r'streakCount',
+          property: r'type',
           value: value,
         ),
       );
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  streakCountBetween(
-    int lower,
-    int upper, {
+  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition> typeBetween(
+    SessionType lower,
+    SessionType upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.between(
-          property: r'streakCount',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  taroCountEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'taroCount', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  taroCountGreaterThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'taroCount',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  taroCountLessThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'taroCount',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  taroCountBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'taroCount',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  weekFocusDurationEqualTo(int value) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'weekFocusDuration', value: value),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  weekFocusDurationGreaterThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'weekFocusDuration',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  weekFocusDurationLessThan(int value, {bool include = false}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'weekFocusDuration',
-          value: value,
-        ),
-      );
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterFilterCondition>
-  weekFocusDurationBetween(
-    int lower,
-    int upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'weekFocusDuration',
+          property: r'type',
           lower: lower,
           includeLower: includeLower,
           upper: upper,
@@ -698,54 +541,27 @@ extension FocusSessionQueryLinks
 
 extension FocusSessionQuerySortBy
     on QueryBuilder<FocusSession, FocusSession, QSortBy> {
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByBreakActive() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByDuration() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'breakActive', Sort.asc);
+      return query.addSortBy(r'duration', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByBreakActiveDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByDurationDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'breakActive', Sort.desc);
+      return query.addSortBy(r'duration', Sort.desc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByCreatedAt() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByEndAt() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'createdAt', Sort.asc);
+      return query.addSortBy(r'endAt', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByCreatedAtDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByEndAtDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'createdAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByFocusActive() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'focusActive', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByFocusActiveDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'focusActive', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByHighestStreak() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'highestStreak', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByHighestStreakDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'highestStreak', Sort.desc);
+      return query.addSortBy(r'endAt', Sort.desc);
     });
   }
 
@@ -761,109 +577,54 @@ extension FocusSessionQuerySortBy
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByLastFocusAt() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByStartAt() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastFocusAt', Sort.asc);
+      return query.addSortBy(r'startAt', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByLastFocusAtDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByStartAtDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastFocusAt', Sort.desc);
+      return query.addSortBy(r'startAt', Sort.desc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByStreakCount() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByType() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'streakCount', Sort.asc);
+      return query.addSortBy(r'type', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByStreakCountDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByTypeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'streakCount', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByTaroCount() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'taroCount', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> sortByTaroCountDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'taroCount', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByWeekFocusDuration() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weekFocusDuration', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  sortByWeekFocusDurationDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weekFocusDuration', Sort.desc);
+      return query.addSortBy(r'type', Sort.desc);
     });
   }
 }
 
 extension FocusSessionQuerySortThenBy
     on QueryBuilder<FocusSession, FocusSession, QSortThenBy> {
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByBreakActive() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByDuration() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'breakActive', Sort.asc);
+      return query.addSortBy(r'duration', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByBreakActiveDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByDurationDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'breakActive', Sort.desc);
+      return query.addSortBy(r'duration', Sort.desc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByCreatedAt() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByEndAt() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'createdAt', Sort.asc);
+      return query.addSortBy(r'endAt', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByCreatedAtDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByEndAtDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'createdAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByFocusActive() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'focusActive', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByFocusActiveDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'focusActive', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByHighestStreak() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'highestStreak', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByHighestStreakDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'highestStreak', Sort.desc);
+      return query.addSortBy(r'endAt', Sort.desc);
     });
   }
 
@@ -891,83 +652,42 @@ extension FocusSessionQuerySortThenBy
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByLastFocusAt() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByStartAt() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastFocusAt', Sort.asc);
+      return query.addSortBy(r'startAt', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByLastFocusAtDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByStartAtDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'lastFocusAt', Sort.desc);
+      return query.addSortBy(r'startAt', Sort.desc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByStreakCount() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByType() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'streakCount', Sort.asc);
+      return query.addSortBy(r'type', Sort.asc);
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByStreakCountDesc() {
+  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByTypeDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'streakCount', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByTaroCount() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'taroCount', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy> thenByTaroCountDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'taroCount', Sort.desc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByWeekFocusDuration() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weekFocusDuration', Sort.asc);
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QAfterSortBy>
-  thenByWeekFocusDurationDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'weekFocusDuration', Sort.desc);
+      return query.addSortBy(r'type', Sort.desc);
     });
   }
 }
 
 extension FocusSessionQueryWhereDistinct
     on QueryBuilder<FocusSession, FocusSession, QDistinct> {
-  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByBreakActive() {
+  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByDuration() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'breakActive');
+      return query.addDistinctBy(r'duration');
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByCreatedAt() {
+  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByEndAt() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'createdAt');
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByFocusActive() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'focusActive');
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QDistinct>
-  distinctByHighestStreak() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'highestStreak');
+      return query.addDistinctBy(r'endAt');
     });
   }
 
@@ -977,28 +697,15 @@ extension FocusSessionQueryWhereDistinct
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByLastFocusAt() {
+  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByStartAt() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'lastFocusAt');
+      return query.addDistinctBy(r'startAt');
     });
   }
 
-  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByStreakCount() {
+  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByType() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'streakCount');
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QDistinct> distinctByTaroCount() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'taroCount');
-    });
-  }
-
-  QueryBuilder<FocusSession, FocusSession, QDistinct>
-  distinctByWeekFocusDuration() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'weekFocusDuration');
+      return query.addDistinctBy(r'type');
     });
   }
 }
@@ -1011,27 +718,15 @@ extension FocusSessionQueryProperty
     });
   }
 
-  QueryBuilder<FocusSession, bool, QQueryOperations> breakActiveProperty() {
+  QueryBuilder<FocusSession, int, QQueryOperations> durationProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'breakActive');
+      return query.addPropertyName(r'duration');
     });
   }
 
-  QueryBuilder<FocusSession, DateTime, QQueryOperations> createdAtProperty() {
+  QueryBuilder<FocusSession, DateTime, QQueryOperations> endAtProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'createdAt');
-    });
-  }
-
-  QueryBuilder<FocusSession, bool, QQueryOperations> focusActiveProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'focusActive');
-    });
-  }
-
-  QueryBuilder<FocusSession, int, QQueryOperations> highestStreakProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'highestStreak');
+      return query.addPropertyName(r'endAt');
     });
   }
 
@@ -1041,28 +736,15 @@ extension FocusSessionQueryProperty
     });
   }
 
-  QueryBuilder<FocusSession, DateTime, QQueryOperations> lastFocusAtProperty() {
+  QueryBuilder<FocusSession, DateTime, QQueryOperations> startAtProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'lastFocusAt');
+      return query.addPropertyName(r'startAt');
     });
   }
 
-  QueryBuilder<FocusSession, int, QQueryOperations> streakCountProperty() {
+  QueryBuilder<FocusSession, SessionType, QQueryOperations> typeProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'streakCount');
-    });
-  }
-
-  QueryBuilder<FocusSession, int, QQueryOperations> taroCountProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'taroCount');
-    });
-  }
-
-  QueryBuilder<FocusSession, int, QQueryOperations>
-  weekFocusDurationProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'weekFocusDuration');
+      return query.addPropertyName(r'type');
     });
   }
 }

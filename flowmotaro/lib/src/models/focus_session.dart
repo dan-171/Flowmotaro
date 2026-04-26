@@ -1,5 +1,6 @@
 import 'package:isar_community/isar.dart';
 
+import 'enum.dart';
 import 'user.dart';
 part 'focus_session.g.dart';
 
@@ -9,13 +10,12 @@ class FocusSession{
 
   final user = IsarLink<User>();
 
-  DateTime createdAt = DateTime.now();
-  int taroCount = 0;
-  int streakCount = 0;
-  int highestStreak = 0;
-  bool focusActive = false;
-  bool breakActive = false;
-  int weekFocusDuration = 0;
-  DateTime lastFocusAt = DateTime.now();
+  late DateTime startAt;
+  late DateTime endAt;
+  int duration = 0;
+
+  @enumerated
+  late SessionType type;
+  
   bool isSynced = false;
 }
