@@ -1,13 +1,18 @@
+import 'package:flowmotaro/src/services/providers.dart';
+import 'package:flowmotaro/src/services/storage_services/users_repository.dart';
+import 'package:flowmotaro/src/viewmodels/guest_sign_in_viewmodel.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:isar_community/isar.dart';
 
-class GuestSignIn extends StatefulWidget {
+class GuestSignIn extends ConsumerStatefulWidget {
   const GuestSignIn({super.key});
 
   @override
-  State<GuestSignIn> createState() => _GuestSignInState();
+  ConsumerState<GuestSignIn> createState() => _GuestSignInState();
 }
 
-class _GuestSignInState extends State<GuestSignIn> {
+class _GuestSignInState extends ConsumerState<GuestSignIn> {
   final TextEditingController _usernameController = TextEditingController();
 
   @override
@@ -56,8 +61,23 @@ class _GuestSignInState extends State<GuestSignIn> {
             ),
             const SizedBox(height: 15),
             ElevatedButton(
-              onPressed: () {
-                // handle confirm
+              onPressed: () async {
+                final username = _usernameController.text.trim();
+                if (username.isEmpty) return;
+
+                await ref
+                    .read(guestSignInViewModelProvider.notifier)
+                    .continueAsGuest(username);
+
+                // ref.listen(guestSignInViewModelProvider, (prev, next) {
+                //   next.whenOrNull(
+                //     data: (user) {
+                //       if (user != null) {
+                //         // Navigator.pushReplacement(...)
+                //       }
+                //     },
+                //   );
+                // });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
