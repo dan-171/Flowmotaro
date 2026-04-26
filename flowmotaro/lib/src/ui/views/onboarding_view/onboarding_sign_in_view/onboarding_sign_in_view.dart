@@ -58,118 +58,125 @@ class _OnboardingSignInViewState extends State<OnboardingSignInView> {
   }
 
   Widget _buildMainContent(){
-    return Column(
-      children: [
-        SizedBox(height: 200,),
-        Center(
-          child: SizedBox(
-            height: stepHeight * howItWorksText.length + titleHeight, // + title
-            child: Stack(
-              children: [
-                StepsLine(
-                  topOffset: lineTopOffset,
-                  leftOffset: paddingM + (circleSize / 2) - 1,
-                  height: stepHeight * howItWorksText.length - stepHeight,
-                  color: Colors.grey.shade300,
-                ),
-
-                ValueListenableBuilder<int>(
-                  valueListenable: currentIndex,
-                  builder: (context, index, _) {
-                    return MovingCircleIndicator(
-                      currentIndex: index,
-                      stepHeight: stepHeight,
-                      topOffset: movingCircleTopOffset,
-                      leftOffset: paddingM + (circleSize / 2) - movingCircleSize / 2,
-                      size: movingCircleSize,
-                      color: Theme.of(context).colorScheme.secondary,
-                    );
-                  },
-                ),
-
-                ValueListenableBuilder<int>(
-                  valueListenable: currentIndex,
-                  builder: (context, index, _) {
-                    return StepsList(
-                      steps: howItWorksText,
-                      currentIndex: index,
-                      stepHeight: stepHeight,
-                      paddingM: paddingM,
-                      circleSize: circleSize,
-                    );
-                  },
-                ),
-              ],
-            )
-          ),
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          minHeight: MediaQuery.of(context).size.height,
         ),
-        SizedBox(height: paddingM),
-        Expanded(
-          child: SizedBox(
-            width: double.infinity,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50.0), 
-                  topRight: Radius.circular(50.0),
+        child: IntrinsicHeight(
+          child: Column(
+            children: [
+              SizedBox(height: 200,),
+              Center(
+                child: SizedBox(
+                  height: stepHeight * howItWorksText.length + titleHeight, // + title
+                  child: Stack(
+                    children: [
+                      StepsLine(
+                        topOffset: lineTopOffset,
+                        leftOffset: paddingM + (circleSize / 2) - 1,
+                        height: stepHeight * howItWorksText.length - stepHeight,
+                        color: Colors.grey.shade300,
+                      ),
+          
+                      ValueListenableBuilder<int>(
+                        valueListenable: currentIndex,
+                        builder: (context, index, _) {
+                          return MovingCircleIndicator(
+                            currentIndex: index,
+                            stepHeight: stepHeight,
+                            topOffset: movingCircleTopOffset,
+                            leftOffset: paddingM + (circleSize / 2) - movingCircleSize / 2,
+                            size: movingCircleSize,
+                            color: Theme.of(context).colorScheme.secondary,
+                          );
+                        },
+                      ),
+          
+                      ValueListenableBuilder<int>(
+                        valueListenable: currentIndex,
+                        builder: (context, index, _) {
+                          return StepsList(
+                            steps: howItWorksText,
+                            currentIndex: index,
+                            stepHeight: stepHeight,
+                            paddingM: paddingM,
+                            circleSize: circleSize,
+                          );
+                        },
+                      ),
+                    ],
+                  )
                 ),
-                color: Theme.of(context).colorScheme.primaryContainer,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: paddingM),
-                    child: Text('Sign In',
-                      style: Theme.of(context).textTheme.titleLarge,
+              SizedBox(height: paddingM),
+              Expanded(
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(50.0), 
+                      topRight: Radius.circular(50.0),
                     ),
+                    color: Theme.of(context).colorScheme.primaryContainer,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: ElevatedButton(
-                        onPressed: (){},
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: paddingM),
+                        child: Text('Sign In',
+                          style: Theme.of(context).textTheme.titleLarge,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: ElevatedButton(
+                            onPressed: (){},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              elevation: 2,
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/icons/google.png',
+                                  height: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                const Text('Sign in with Google'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10.0),
+                        child: Text('or',),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          setState(() {
+                            _showGuestSignInOverlay = true;
+                          });
+                        },
+                        icon: const Icon(Icons.login),
+                        label: const Text('Continue as guest'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
                           elevation: 2,
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/images/icons/google.png',
-                              height: 20,
-                            ),
-                            const SizedBox(width: 10),
-                            const Text('Sign in with Google'),
-                          ],
-                        ),
                       ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0),
-                    child: Text('or',),
+                    ],
                   ),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      setState(() {
-                        _showGuestSignInOverlay = true;
-                      });
-                    },
-                    icon: const Icon(Icons.login),
-                    label: const Text('Continue as guest'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black,
-                      elevation: 2,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              )
+            ],
           ),
-        )
-      ],
+        ),
+      ),
     );
   }
 
