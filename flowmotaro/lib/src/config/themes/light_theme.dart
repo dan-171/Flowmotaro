@@ -19,12 +19,3 @@ ElevatedButtonThemeData elevatedButtonTheme = ElevatedButtonThemeData(
             fixedSize: Size(250, 45),
           ),
         );
-
-TextTheme textTheme = TextTheme(
-      titleLarge: TextStyle(
-        fontWeight: FontWeight(800),
-      ),
-      titleMedium: TextStyle(
-        fontWeight: FontWeight(600),
-      )
-  );
