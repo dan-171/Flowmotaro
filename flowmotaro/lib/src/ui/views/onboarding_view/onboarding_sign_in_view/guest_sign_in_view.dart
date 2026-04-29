@@ -61,10 +61,7 @@ class _GuestSignInState extends ConsumerState<GuestSignIn> {
               onPressed: () async {
                 final username = _usernameController.text.trim();
                 if (username.isEmpty) return;
-
-                await ref
-                    .read(guestSignInViewModelProvider.notifier)
-                    .continueAsGuest(username);
+                await ref.read(guestSignInViewModelProvider.notifier).continueAsGuest(username);
 
                 // ref.listen(guestSignInViewModelProvider, (prev, next) {
                 //   next.whenOrNull(
