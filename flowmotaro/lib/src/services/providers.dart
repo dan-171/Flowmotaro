@@ -4,16 +4,15 @@ import 'package:flowmotaro/src/viewmodels/guest_sign_in_viewmodel.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar_community/isar.dart';
 
+final isarProvider = Provider<Isar>((ref) {
+  throw UnimplementedError();
+});
+
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   final isar = ref.watch(isarProvider);
   return UserRepository(isar);
 });
 
-final isarProvider = Provider<Isar>((ref) {
-  throw UnimplementedError();
-});
-
-final guestSignInViewModelProvider =
-    NotifierProvider<GuestSignInViewModel, AsyncValue<User?>>(
+final guestSignInViewModelProvider = NotifierProvider<GuestSignInViewModel, AsyncValue<User?>>(
   GuestSignInViewModel.new,
 );

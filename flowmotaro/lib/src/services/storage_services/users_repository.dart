@@ -6,7 +6,7 @@ class UserRepository {
 
   UserRepository(this.isar);
 
-  Future<User> createGuestUser(String username) async {
+  Future<User> createLocalUser(String username) async {
     final user = User()
       ..name = username
       ..createdAt = DateTime.now()
