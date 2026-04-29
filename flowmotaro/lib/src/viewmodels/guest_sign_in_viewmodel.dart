@@ -15,7 +15,7 @@ class GuestSignInViewModel extends Notifier<AsyncValue<User?>> {
   Future<void> continueAsGuest(String username) async {
     state = const AsyncValue.loading();
     try {
-      final user = await _repo.createGuestUser(username);
+      final user = await _repo.createLocalUser(username);
       state = AsyncValue.data(user);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
