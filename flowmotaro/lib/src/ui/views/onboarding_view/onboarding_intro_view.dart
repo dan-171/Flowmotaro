@@ -81,7 +81,7 @@ class _OnboardingViewState extends State<OnboardingIntroView> with SingleTickerP
               padding: const EdgeInsetsGeometry.only(bottom: paddingL),
               child: ElevatedButton(
                 onPressed: (){
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context){
                       return OnboardingSignInView();
                     })
