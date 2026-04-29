@@ -1,4 +1,5 @@
 import 'package:flowmotaro/src/services/providers.dart';
+import 'package:flowmotaro/src/ui/views/timer_view/timer_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,6 +12,7 @@ class GuestSignIn extends ConsumerStatefulWidget {
 
 class _GuestSignInState extends ConsumerState<GuestSignIn> {
   final TextEditingController _usernameController = TextEditingController();
+  bool validUsernameInserted = true;
 
   @override
   void dispose() {
@@ -20,6 +22,20 @@ class _GuestSignInState extends ConsumerState<GuestSignIn> {
 
   @override
   Widget build(BuildContext context) {
+    // navigate to next page
+    ref.listen(guestSignInViewModelProvider, (prev, next) {
+      next.whenOrNull(
+        data: (user) {
+          if (user != null) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => TimerPage(title: "Timer",)),
+            );
+          }
+        },
+      );
+    });
+
     return Material(
       borderRadius: BorderRadius.circular(20),
       child: Container(
@@ -60,18 +76,17 @@ class _GuestSignInState extends ConsumerState<GuestSignIn> {
             ElevatedButton(
               onPressed: () async {
                 final username = _usernameController.text.trim();
-                if (username.isEmpty) return;
+                if (username.isEmpty){
+                  setState(() {
+                    validUsernameInserted = false;
+                  });
+                  return;
+                }
+                setState(() {
+                  validUsernameInserted = true;
+                });
+                // store username to local storage
                 await ref.read(guestSignInViewModelProvider.notifier).continueAsGuest(username);
-
-                // ref.listen(guestSignInViewModelProvider, (prev, next) {
-                //   next.whenOrNull(
-                //     data: (user) {
-                //       if (user != null) {
-                //         // Navigator.pushReplacement(...)
-                //       }
-                //     },
-                //   );
-                // });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
@@ -79,7 +94,14 @@ class _GuestSignInState extends ConsumerState<GuestSignIn> {
                 elevation: 2,
               ),
               child: const Text('Confirm'),
-            )
+            ),
+            if (!validUsernameInserted) ...[
+              SizedBox(height: 20,),
+              Text(
+                "Username cannot be left blank",
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.red,),
+              ),
+            ],
           ],
         ),
       ),
